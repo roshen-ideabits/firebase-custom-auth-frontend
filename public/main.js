@@ -41,21 +41,27 @@ async function handleSubmit(event, endpoint) {
     });
 
     const data = await response.json();
-
-    if(response.status === 302){
+    
+    if (response.status === 302) {
       if (data.redirectUrl) {
         window.location.href = data.redirectUrl;
-      } else {
-        feedback.textContent = 'Success! (No redirect URL configured)';
+        return;
       }
-    }else{
-      feedback.textContent = data.error;
+      
+      if (endpoint === 'register' && data.uid && data.customToken) {
+        feedback.textContent = 'Registration successful!';
+        setTimeout(() => {
+          setActiveForm('login');
+        }, 1500);
+      } else if (data.uid && data.customToken) {
+        feedback.textContent = 'Login successful!';
+      }
+    } else {
+      feedback.textContent = data.error || 'Request failed';
     }
-    
-    
   } catch (err) {
     console.error('Error details:', err);
-    feedback.textContent = `Error: ${err.message} ane manda`;
+    feedback.textContent = `Error: ${err.message}`;
   }
 }
 
