@@ -1,5 +1,8 @@
 const API_BASE_URL = window.AUTH_API_BASE_URL || 'http://localhost:4000';
 
+const urlParams = new URLSearchParams(window.location.search);
+
+
 const loginForm = document.querySelector('#login-form');
 const registerForm = document.querySelector('#register-form');
 const showLoginBtn = document.querySelector('#show-login');
@@ -38,13 +41,21 @@ async function handleSubmit(event, endpoint) {
     });
 
     const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.error || 'Request failed');
-    }
 
-    feedback.textContent = `Success! Custom token: ${data.customToken.slice(0, 18)}…`;
+    if(response.status === 302){
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      } else {
+        feedback.textContent = 'Success! (No redirect URL configured)';
+      }
+    }else{
+      feedback.textContent = data.error;
+    }
+    
+    
   } catch (err) {
-    feedback.textContent = `Error: ${err.message}`;
+    console.error('Error details:', err);
+    feedback.textContent = `Error: ${err.message} ane manda`;
   }
 }
 
