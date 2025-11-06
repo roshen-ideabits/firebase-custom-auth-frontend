@@ -41,13 +41,13 @@ async function handleSubmit(event, endpoint) {
     });
 
     const data = await response.json();
-    
+
     if (response.status === 302) {
       if (data.redirectUrl) {
         window.location.href = data.redirectUrl;
         return;
       }
-      
+
       if (endpoint === 'register' && data.uid && data.customToken) {
         feedback.textContent = 'Registration successful!';
         setTimeout(() => {
@@ -58,6 +58,14 @@ async function handleSubmit(event, endpoint) {
       }
     } else {
       feedback.textContent = data.error || 'Request failed';
+    }
+
+    // Redirect to the sessions endpoint which will set cookies and redirect to app
+    if (data.sessionUrl) {
+      feedback.textContent = 'Success! Redirecting…';
+      window.location.href = data.sessionUrl;
+    } else {
+      feedback.textContent = `Success! Custom token: ${data.customToken.slice(0, 18)}…`;
     }
   } catch (err) {
     console.error('Error details:', err);
